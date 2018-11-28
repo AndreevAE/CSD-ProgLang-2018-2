@@ -13,4 +13,4 @@ frontend javascript for json api backend from https://github.com/AndreevAE/CSD-P
 Срок выполнения 1 задания - 29 ноября
 
 # Starting App
-> not implement yet
+Just paste code from script.js to script tag ```<script> ... </script>``` in first task
