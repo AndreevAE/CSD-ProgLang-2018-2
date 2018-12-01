@@ -20,6 +20,7 @@ function createExplorerFromJSON(json)
     var queryParagraph = document.createElement("p");
     var errorParagraph = document.createElement("p");
     var table = document.createElement("table");
+    var fileContent = document.createElement("p");
     var resultDirs;
     var currentPath;
 
@@ -67,6 +68,10 @@ function createExplorerFromJSON(json)
         }, false);
         pathA.textContent = "..";
         tabCell.appendChild(pathA);
+
+        if (!currentPath.endsWith('/')) {
+            currentPath += '/'
+        }
     }
 
     for (var i = 0; i < resultDirs.length; i++) {
@@ -74,22 +79,31 @@ function createExplorerFromJSON(json)
 
         var tabCell = tr.insertCell(-1);
         var pathA = document.createElement("a");
-        var lsLink = currentPath + resultDirs[i] + "?ls";
         pathA.setAttribute('href', 'javascript:void(0)');
-        pathA.addEventListener("click", function(){
-            console.log(lsLink);
+        pathA.addEventListener("click", function(e){
+            var currentLsLink = e.target.innerText;
+            var lsLink = currentPath + currentLsLink + "?ls"
             jsonString = httpGet(lsLink);
             json = JSON.parse(jsonString);
-            createExplorerFromJSON(json);
+            if (typeof json['result'] === 'undefined') {
+                var downloadLink = currentPath + currentLsLink + "?download"
+                fileContent.textContent = httpGet(downloadLink);
+            } else {
+                createExplorerFromJSON(json);
+            }
+
         }, false);
         pathA.textContent = resultDirs[i];
         tabCell.appendChild(pathA);
 
         var rmdirCell = tr.insertCell(-1);
         var deleteA = document.createElement("a");
-        var rmdirLink = currentPath + resultDirs[i] + "/?rmdir";
         deleteA.setAttribute('href', 'javascript:void(0)');
-        deleteA.addEventListener("click", function(){
+        deleteA.addEventListener("click", function(e){
+            console.log()
+            var currentRmdirLink = e.target.parentElement.parentElement.children[0].children[0].innerText
+            var dir = resultDirs[i]
+            var rmdirLink = currentPath + currentRmdirLink  + "/?rmdir";
             console.log(rmdirLink);
             httpGet(rmdirLink);
 
@@ -129,6 +143,8 @@ function createExplorerFromJSON(json)
     mkdirButton.onclick = createDirHandler();
     mkdirParagraph.appendChild(mkdirButton);
     divContainer.appendChild(mkdirParagraph);
+
+    divContainer.appendChild(fileContent);
 }
 
 rootPath();
